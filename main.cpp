@@ -141,12 +141,8 @@ int main(int argc, char* argv[]) {
         else if (command == "help") {
             fmt::print("Available commands:\n");
             fmt::print("  load          - Load images (1.jpg and 2.jpg)\n");
-            fmt::print("  show1         - Show first image\n");
-            fmt::print("  show2         - Show second image\n");
             fmt::print("  features      - Detect and show features\n");
-            fmt::print("  stitch_pano   - Stitch images in PANORAMA mode\n");
             fmt::print("  stitch_scans  - Stitch images in SCANS mode\n");
-            fmt::print("  save <name>   - Save last result with specified name\n");
             fmt::print("  exit          - Exit the program\n");
         }
         else if (command == "load") {
