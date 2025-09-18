@@ -18,14 +18,14 @@ cv::Mat read_image(const std::string& img_path) {
     cv::Mat img = cv::imread(path, cv::IMREAD_COLOR);
     if (img.empty()) {
         fmt::print("Error: Could not read the image from {}\n", path);
-        return cv::Mat();
+        return {};
     }
     fmt::print("Image read successfully. Size: {}x{}\n", img.cols, img.rows);
     return img;
 }
 
 // 显示图像函数
-void show_image(const std::string& window_name, const cv::Mat& img, int width = 800) {
+void show_image(const std::string& window_name, const cv::Mat& img, const int width = 800) {
     if (img.empty()) return;
     
     double aspect_ratio = static_cast<double>(img.cols) / img.rows;
@@ -41,7 +41,7 @@ void show_image(const std::string& window_name, const cv::Mat& img, int width = 
 
 // 检测和显示图像特征点
 bool detect_and_show_features(const cv::Mat& img1, const cv::Mat& img2) {
-    cv::Ptr<cv::ORB> orb = cv::ORB::create(5000); // 增加特征点数量
+    const cv::Ptr<cv::ORB> orb = cv::ORB::create(5000); // 增加特征点数量
     std::vector<cv::KeyPoint> keypoints1, keypoints2;
     cv::Mat descriptors1, descriptors2;
     // 检测特征点和计算描述符
@@ -58,7 +58,7 @@ bool detect_and_show_features(const cv::Mat& img1, const cv::Mat& img2) {
     }
     
     // 使用BFMatcher进行特征匹配
-    cv::BFMatcher matcher(cv::NORM_HAMMING);
+    const cv::BFMatcher matcher(cv::NORM_HAMMING);
     std::vector<cv::DMatch> matches;
     matcher.match(descriptors1, descriptors2, matches);
     
@@ -80,17 +80,15 @@ bool detect_and_show_features(const cv::Mat& img1, const cv::Mat& img2) {
 bool stitch_images(const std::vector<cv::Mat>& images, cv::Mat& result, cv::Stitcher::Mode mode = cv::Stitcher::PANORAMA) {
     try {
         // 创建拼接器
-        cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(mode);
+        const cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(mode);
         
         // 设置自定义特征查找器（增加特征点数量）
-        cv::Ptr<cv::ORB> orb = cv::ORB::create(5000);
+        const cv::Ptr<cv::ORB> orb = cv::ORB::create(5000);
         stitcher->setFeaturesFinder(orb);
         
         // 执行拼接
-        cv::Stitcher::Status status = stitcher->stitch(images, result);
-        
         // 处理拼接状态
-        if (status == cv::Stitcher::OK) {
+        if (cv::Stitcher::Status status = stitcher->stitch(images, result); status == cv::Stitcher::OK) {
             fmt::print("Stitching completed successfully\n");
             return true;
         } else {
@@ -167,9 +165,8 @@ int main(int argc, char* argv[]) {
         else if (command == "stitch_scans") {
             if (images_loaded) {
                 std::vector<cv::Mat> images = {img_one, img_two};
-                cv::Mat result;
-                
-                if (stitch_images(images, result, cv::Stitcher::SCANS)) {
+
+                if (cv::Mat result; stitch_images(images, result, cv::Stitcher::SCANS)) {
                     cv::imwrite("scans_result.jpg", result);
                     fmt::print("Result saved as scans_result.jpg\n");
                 }
